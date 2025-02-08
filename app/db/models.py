@@ -1,7 +1,8 @@
 from datetime import datetime
 from sqlalchemy import DateTime, Integer, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic_settings import BaseSettings
+from typing import List
 
 from app.db.database import Base
 
@@ -16,6 +17,9 @@ class Task(Base):
     created_by: Mapped[int] = mapped_column(ForeignKey("user.id"))
     time: Mapped[datetime]
     
+    creator: Mapped["User"] = relationship(back_populates="tasks")
+    
+    
 class User(Base):
     __tablename__="user"
     
@@ -24,4 +28,5 @@ class User(Base):
     full_name: Mapped[str]
     role: Mapped[str]
     
+    tasks: Mapped[List["Task"]] = relationship(back_populates="creator")
     
