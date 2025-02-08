@@ -1,0 +1,8 @@
+fastapi
+pydantic
+sqlalchemy
+datetime
+psycopg2
+asyncpg
+pydantic-settings
+alembic
