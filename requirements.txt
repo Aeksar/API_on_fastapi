@@ -6,3 +6,9 @@ psycopg2
 asyncpg
 pydantic-settings
 alembic
+pytest
+anyio
+asyncio
+trio
+twisted
+httpx

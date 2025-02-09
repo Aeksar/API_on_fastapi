@@ -6,6 +6,7 @@ from app.db.database import get_async_session
 from app.api.schemas.user import UserSchema, UserCreate, UserUpdate
 from app.repositories.user_repository import SQLAlchemyUserRepository
 
+
 user_router = APIRouter(prefix="/user")
 
 async def get_user_rep(session: Annotated[AsyncSession, Depends(get_async_session)]) -> SQLAlchemyUserRepository:
@@ -16,7 +17,7 @@ async def get_user_rep(session: Annotated[AsyncSession, Depends(get_async_sessio
     response_model=UserSchema,
     status_code=status.HTTP_201_CREATED)
 async def create_user(
-    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep, use_cache=False)],
     userC: UserCreate
     ):
     return await rep.create_user(userC)
