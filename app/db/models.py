@@ -6,7 +6,6 @@ from typing import List
 
 from app.db.database import Base
 
-
 class Task(Base):
     __tablename__="task"
     
@@ -24,9 +23,11 @@ class User(Base):
     __tablename__="user"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    username: Mapped[str]
     email: Mapped[str]
     full_name: Mapped[str]
-    role: Mapped[str]
+    role: Mapped[str] = mapped_column(nullable=True)
     
     tasks: Mapped[List["Task"]] = relationship(back_populates="creator")
     
+

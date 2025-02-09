@@ -22,7 +22,7 @@ class TaskRepository(ABC):
         pass
     
     @abstractmethod
-    async def update_task(self, id):
+    async def update_task(self, id, modelUpdate: TaskUpdate):
         pass
     
     @abstractmethod
