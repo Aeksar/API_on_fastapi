@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
-from app.api.schemas.user import UserCreate, UserSchema, UserUpdate
+from app.api.schemas.user import UserBaseSchema, UserFullSchema, UserUpdate
 from app.db.models import Task, User
 from app.repositories.rep_utils import find_by_id
 
@@ -14,7 +14,7 @@ class UserRepository(ABC):
         pass
     
     @abstractmethod
-    async def create_user(self, userC: UserCreate):
+    async def create_user(self, userC: UserBaseSchema):
         pass
     
     @abstractmethod
@@ -42,7 +42,7 @@ class SQLAlchemyUserRepository(UserRepository):
         query = await self.session.execute(select(User))
         return query.scalars().all()
       
-    async def create_user(self, userC: UserCreate):
+    async def create_user(self, userC: UserBaseSchema):
         new_user = User(**userC.model_dump())
         self.session.add(new_user)
         await self.session.commit()
@@ -70,6 +70,8 @@ class SQLAlchemyUserRepository(UserRepository):
     async def user_task(self, user_id):
         query = await self.session.execute(select(Task).where(Task.created_by == user_id))
         return query.scalars().all()
+
+        
         
         
         

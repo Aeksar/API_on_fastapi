@@ -27,6 +27,7 @@ class User(Base):
     email: Mapped[str]
     full_name: Mapped[str]
     role: Mapped[str] = mapped_column(nullable=True)
+    password: Mapped[str]
     
     tasks: Mapped[List["Task"]] = relationship(back_populates="creator")
     

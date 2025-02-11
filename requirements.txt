@@ -12,3 +12,7 @@ asyncio
 trio
 twisted
 httpx
+passlib
+pyjwt
+python-multipart
+bcrypt

@@ -6,6 +6,8 @@ from app.api.schemas.task import TaskSchemas, TaskCreate
 from app.repositories.task_repository import SQLAlchemyTaskRepository
 from app.db.database import get_async_session
 from app.db.models import Task
+from app.api.schemas.user import UserFullSchema
+from app.core.security import get_current_user
 
 
 task_router = APIRouter(prefix="/task")
@@ -25,11 +27,11 @@ async def get_one_task(
     ):
     return await rep.get_task(task_id)
 
-@task_router.post('/{user_id}', status_code=status.HTTP_201_CREATED)
+@task_router.post('/new', status_code=status.HTTP_201_CREATED)
 async def create_task(
 rep: Annotated[SQLAlchemyTaskRepository, Depends(get_task_rep)],
-user_id: int, #future: switch user_id to token from header
+user: Annotated[UserFullSchema, Depends(get_current_user)],
 new_task: TaskCreate
 ):
-    return await rep.create_task(new_task, user_id)
+    return await rep.create_task(new_task, user.id)
     
