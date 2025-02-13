@@ -16,3 +16,5 @@ passlib
 pyjwt
 python-multipart
 bcrypt
+uvicorn
+pydantic[email]
