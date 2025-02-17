@@ -14,7 +14,6 @@ from app.core.security import (
     get_current_user,
     authenticate,
     create_token,
-    oauth2_scheme,
     get_user_by_username,
     get_user_by_email, 
     get_hashed_password
@@ -54,12 +53,14 @@ async def update_user(
     owner: Annotated[UserFullSchema, Depends(get_current_user)],
     modelUpdate: UserUpdate,
 ):
-    if owner.role != "admin":
+    rep = SQLAlchemyUserRepository(session=session)
+    user = await rep.get_user(user_id)
+    if owner.role != "admin" or user.username != owner.username:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No rights for this action"
         )
-    rep = SQLAlchemyUserRepository(session=session)
+    
     return await rep.update_user(user_id, modelUpdate)
 
 @user_router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -135,7 +136,7 @@ async def reg_user(
 
 
 @user_router.get("/me/task")
-async def read_own_items(
+async def user_tasks(
     owner: Annotated[UserFullSchema, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)]
     ):

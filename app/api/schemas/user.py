@@ -11,7 +11,7 @@ class UserBaseSchema(BaseModel):
     # @field_validator("password")
     # def validate_pwd(cls, value: str):
     #     import re
-    #     condition = r"^(?=.*[A-Z])(?=.[a-z])(?=.*[!@#$%^&*(),.])"
+    #     condition = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()])"
     #     if not re.match(condition, value):
     #         raise ValueError(
     #             "Пароль должен содержать минимум 8 символов,"

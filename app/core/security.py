@@ -10,9 +10,8 @@ import jwt
 
 from app.db.models import User
 from app.db.database import get_async_session
-from app.api.schemas.user import UserBaseSchema, UserFullSchema
 from app.core.config import settings
-from app.repositories.rep_utils import sqlalchemy_to_pydantic
+from app.utils.rep_utils import sqlalchemy_to_pydantic
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 pwd_context = CryptContext(schemes=["bcrypt"])

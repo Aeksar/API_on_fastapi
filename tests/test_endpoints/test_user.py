@@ -1,23 +1,27 @@
+import pytest
+from httpx import ASGITransport, AsyncClient
 from fastapi.testclient import TestClient
 from main import app
 
 from app.db.database import get_async_session
 from tests.test_endpoints.setup_testdb import get_test_session
 
+
 app.dependency_overrides[get_async_session] = get_test_session
 
-client = TestClient(app)
 
 async def test_create_user():
-
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
         "full_name": "Test User",
         "password": "pupupupu"
     }
-
-    response = client.post("/user/registration", json=user_data)
+    
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.post("/user/registration", json=user_data)
 
     assert response.status_code == 201
     created_user = response.json()
@@ -26,7 +30,10 @@ async def test_create_user():
     assert created_user["password"] != user_data["password"]
 
 async def test_show_all_user():  
-    response = client.get("/user/1")
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://tests"
+    ) as client:
+        response = await client.get("/user/1")
     body = response.json()
     assert body is not None
       
@@ -35,11 +42,14 @@ async def test_token():
         "username": "username",
         "password": "password"
     }
-    respose = client.post(
-        url="user/token", 
-        data=data, 
-        headers={'Content-Type': 'application/x-www-form-urlencoded'}
-    )
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://tests"
+    ) as client:
+        respose = await client.post(
+            url="user/token", 
+            data=data, 
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
 
     body = respose.json()
     headers = respose.headers
