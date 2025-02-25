@@ -1,14 +1,15 @@
+
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
     AsyncSession,
-
 )
 
 from app.core.config import settings
-from app.db.database import Base
-from app.db.models import User
-        
+from app.db.database import Base, get_async_session
+from app.db.models import User, Task
+from main import app   
 
 async def get_test_session():
     try:
@@ -34,4 +35,14 @@ async def get_test_session():
             await conn.run_sync(Base.metadata.drop_all)
         
 
+app.dependency_overrides[get_async_session] = get_test_session
+
+def client_decorator(func):
+    async def wrapper():
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as client:
+            result = await func(client)
+        return result
+    return wrapper
     

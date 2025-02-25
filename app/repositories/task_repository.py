@@ -72,7 +72,7 @@ class SQLAlchemyTaskRepository(TaskRepository):
         if not task:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Task now found"
+                detail="Task not found"
             )
         for key, value in modelUpdate.model_dump(exclude_unset=True).items():
             setattr(task, key, value)

@@ -22,38 +22,37 @@ from app.core.security import (
 
 user_router = APIRouter(prefix="/user")
 
+async def get_user_rep(session: Annotated[AsyncSession, Depends(get_async_session)]):
+    return SQLAlchemyUserRepository(session)
+
 @user_router.post(
     '/create',
     response_model=UserFullSchema,
     status_code=status.HTTP_201_CREATED)
 async def create_user(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
     userC: UserBaseSchema
     ):
-    rep = SQLAlchemyUserRepository(session=session)
     return await rep.create_user(userC)
 
 @user_router.get("/all", response_model=list[UserFullSchema])
-async def show_all_users(session: Annotated[AsyncSession, Depends(get_async_session)]):
-    rep = SQLAlchemyUserRepository(session=session)
+async def show_all_users(rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)]):
     return await rep.get_users()
 
 @user_router.get("/{user_id}")
 async def show_one_user(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
     user_id: int
     ):
-    rep = SQLAlchemyUserRepository(session=session)
     return await rep.get_user(user_id)
 
 @user_router.put("/update/{user_id}")
 async def update_user(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
     user_id: int,
     owner: Annotated[UserFullSchema, Depends(get_current_user)],
     modelUpdate: UserUpdate,
 ):
-    rep = SQLAlchemyUserRepository(session=session)
     user = await rep.get_user(user_id)
     if owner.role != "admin" or user.username != owner.username:
         raise HTTPException(
@@ -66,7 +65,7 @@ async def update_user(
 @user_router.delete("/delete/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     owner: Annotated[UserFullSchema, Depends(get_current_user)],
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
     user_id: int,
 ):
     if owner.role != "admin":
@@ -74,17 +73,15 @@ async def delete_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No rights for this action"
         )
-    rep = SQLAlchemyUserRepository(session=session)
     delete = await rep.delete_user(user_id)
     if delete:
         return
 
 @user_router.get("/tasks/{user_id}")
 async def user_tasks(
-    session: Annotated[AsyncSession, Depends(get_async_session)],
+    rep: Annotated[SQLAlchemyUserRepository, Depends(get_user_rep)],
     user_id: int,
 ):
-    rep = SQLAlchemyUserRepository(session=session)
     return await rep.user_task(user_id)
 
 @user_router.post('/token')
